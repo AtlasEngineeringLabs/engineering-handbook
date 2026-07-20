@@ -95,22 +95,35 @@ The following tools will be installed during Sprint 2:
 
 # Verification
 
-# Git
+## Git
 
 ```bash
 git --version
+```
+
+## Cursor
+
+```bash
 cursor --version
+```
+
+## Docker
+
+```bash
 docker --version
+```
+
+## GitHub CLI
+
+```bash
 gh --version
-
+```
 ---
-
-```markdown
 # Revision History
 
 | Version | Date | Author | Description |
 |---------|------|--------|-------------|
-| 0.1.0 | 2026-07-18 | Leon Pitkin | Initial document created |
+| 0.1.0 | 2026-07-20 | Leon Pitkin | Initial document created |
 
 
 # References

@@ -10,7 +10,7 @@
 
 **Reviewed By:** Pending
 
-**Last Updated:** 2026-07-17
+**Last Updated:** 2026-07-20
 
 ---
 
@@ -37,7 +37,7 @@ The workstation provides a reproducible, secure and professional development env
 # Directory Structure
 
 ```text
-~/AtlasEngineering/
+~/AtlasEngineeringLabs/
 │
 ├── handbook/
 ├── repositories/
@@ -73,6 +73,7 @@ The workstation provides a reproducible, secure and professional development env
 - All engineering work should be version controlled.
 - Security should be considered from the beginning.
 - Documentation is treated as part of the deliverable.
+- Keep solutions as simple as possible while meeting the requirements.
 
 ---
 
@@ -91,6 +92,26 @@ The following tools will be installed during Sprint 2:
 - k9s
 
 ---
+
+# Verification
+
+# Git
+
+```bash
+git --version
+cursor --version
+docker --version
+gh --version
+
+---
+
+```markdown
+# Revision History
+
+| Version | Date | Author | Description |
+|---------|------|--------|-------------|
+| 0.1.0 | 2026-07-18 | Leon Pitkin | Initial document created |
+
 
 # References
 

@@ -431,6 +431,66 @@ How does Terraform determine the build order?
 ☐ Explain Attribudency Graph
 
 
+# Module 5 - Variables
+
+Typical Interview Questions
+- What is a Terraform variable, and why use one instead of hardcoding a value?
+- What's the difference between a variable and a local value?
+- What types can a variable have, and why declare a type at all?
+- How would you supply a variable's value — list the different methods?
+- What is variable precedence, and which source wins if a variable is set in multiple places?
+- Why would you add a validation block to a variable?
+- How do you avoid putting secrets in a .tfvars file committed to version control?
+
+Practical Scenarios
+
+1) A configuration needs to deploy identical infrastructure to dev, staging, and prod, each with different sizing and project IDs.
+How would you use variables and .tfvars files to support this without duplicating code?
+
+2) A CI/CD pipeline needs to inject a project ID and API key at apply time without writing them to any file in the repo.
+How would you supply these values to Terraform securely?
+
+3) An engineer accidentally applies dev-sized variable values to the production envinment because no -var-file was specified.
+How would you prevent this from happening, using defaults and validation?
+
+4) A teammate sets a variable via -var on the CLI, but it doesn't seem to take effect — a different value gets applied instead.
+What would you check regarding variable precedence?
+
+5) A variable currently accepts any string for "environment", but a bad value caused a failed deployment.
+How would you cat this earlier in the workflow?
+
+Common Mistakes
+- Giving security- or environment-critical variables (project ID, credentials, CIDR ranges) a default value, risking accidental use of the wrong one.
+- Committing .tfvars files containing secrets to version control.
+- Not declaring a type, allowing invalid input to pass through until it fails later at the provider/API level.
+- Confusing locals with variables — trying to override a local from the CLI or a .tfvars file (not possible).
+- Forgetting variable precedence oer, leading to confusion over why a set value isn't being used.
+- Not using validation blocks, letting bad input reach plan/apply instead of failing fast.
+
+Key Terminology
+- Input Variable — a named placeholder for a value supplied from outside the configuration.
+- Type Constraint — the declared type (string, number, bool, list, map, object, etc.) a variable must conform to.
+- Default Value — a fallback value used when no value is explicitly supplied.
+- Validation Block — a custom condition that checks a variable's value before it's used.
+- .tfvars File — a file holding variable values, typically one per environment.
+- TF_VAR_* — the environment variable prefix Terraform automatically reads as variable input.
+- Variable Precedence — the defined order Terraform uses to resolve a variable's value when set in multiple places.
+
+Things to Remember
+- Precedence (highest to lowest): CLI -var/-var-file → *.auto.tfvars → terraform.tfvars → TF_VAR_* env vars → default.
+- Variables are external inputs; locals are internal computed values — locals can't be overridden from outside.
+- Avoid defaults on anything security- or environment-sensitive; require explicit values instead.
+- Validation blocks fail fast at plan, before any API call is made.
+- Secrets should go through TF_VAR_* or a secrets manager, never hardcoded in .tf or committed .tfvars.
+
+Revision Checklist
+-  Can explain what a variable is and why it's used
+-  Can list all the ways a variable's value caied
+-  Know the exact variable precedence order
+-  Can explain the difference between a variable and a local value
+-  Understand when to use (and avoid) default values
+-  Can write a basic validation block
+-  Know how to keep secrets out of version control when using variables
 ----------------------------------
 
 # Interview Tips

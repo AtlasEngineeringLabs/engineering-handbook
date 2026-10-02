@@ -508,3 +508,55 @@ When to use it
 Trade-offs
 
 Real-world example
+
+----------------------------------
+
+# Module 6 – Outputs
+
+ - Key concepts
+	Outputs expose values from a Terraform configuration — resource attributes, computed values, or module results — so they can be viewed after apply, referenced by other configurations, or consumed by scripts and pipelines.
+
+ - Typical interview questions.
+	What is a Terraform output, and why would you use one?
+	How do you retrieve output values after apply, outside of the CLI summary?
+	How are outputs used differently at the root module vs. a child module?
+	How would you prevent a sensitive output (like a password) from appearing in logs?
+	Can an output depend on a resource attribute that isn't known until after apply? How does Terraform handle that?
+	How would you consume Terraform outputs in a CI/CD pipeline?
+
+ - A practical scenario (for example, exposing a Load Balancer's IP and DNS name after deployment).
+	After deploying a Load Balancer, the networking team needs its public IP and DNS name to update external monitoring and DNS records.
+	How would you expose talues, and how would a pipeline or engineer retrieve them after apply?
+
+output "lb_ip" {
+  value = google_compute_global_address.lb.address
+}
+
+output "lb_dns_name" {
+  value = google_compute_global_forwarding_rule.lb.name
+}
+
+Retrieved via terraform output lb_ip or terraform output -json in a pipeline step that then updates DNS.
+
+ - Common mistakes (such as outputting unnecessary information or exposing secrets).
+	Outputting unnecessary information — cluttering the interface with values nobody consumes, making it unclear which outputs actually matter.
+	Exposing secrets (passwords, API keys, tokens) without setting sensitive = true, leaking them into CLI output, state files, or CI/CD logs.
+	Referencing an attribute that doesn't exist on the resource type, causing a plan/apply error.
+	Assuming an output value is available before apply runs, when it's actually only known afterward (shown as "known after apply").
+	Not documenting what each output is for, making modules harder for others to consume correctly.
+
+- Key terminology
+	Output — a named value exposed from a configuration, viewable via terraform output.
+	Sensitive Output — an output marked sensitive = true, hidden from CLI display and plan/apply summaries.
+	Known After Apply — a Terraform state meaning a value can't be determined until the resource is actually created.
+	Module Output — a value passed fromchild module back to the calling configuration.
+	terraform output -json — machine-readable format for consuming outputs in scripts or pipelines.
+
+ - A revision checklist
+	Can explain what an output is and why it's needed
+	Know how to retrieve outputs via CLI and in JSON format
+	Understand how module outputs differ from root-level outputs
+	Can mark a sensitive output correctly with sensitive = true
+	Understand "known after apply" and why some outputs aren't available until after apply
+	Can describe a real use case for outputs in a CI/CD or automation workflow
+

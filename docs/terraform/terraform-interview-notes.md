@@ -560,3 +560,46 @@ Retrieved via terraform output lb_ip or terraform output -json in a pipeline ste
 	Understand "known after apply" and why some outputs aren't available until after apply
 	Can describe a real use case for outputs in a CI/CD or automation workflow
 
+-------------
+
+
+# Module 7 - Terraform-State
+
+What is Terraform state?
+A file (terraform.tfstate) recording the real infrastructure Terraform manages and its last known configuration. It maps config resources to real-world objects.
+
+Why does Terraform need state?
+To map config to real resources, calculate diffs during plan, track dependencies and metadata, and improve performance on large infrastructure.
+
+Local vs remote state?
+Local lives on one machine’s disk (risky for teams). Remote lives in a shared backend (e.g. GCS, S3) that supports collaboration, locking, encryption, and versioning.
+
+What is state locking?
+Prevents concurrent operations from modifying state at the same time, avoiding corruption. A stuck lock can be released with terraform force-unlock <ID> (use cautiously).
+
+What is drift?
+When real infrastructure differs from state/config, usually from manual console changes. Detected by terraform plan; plan -refresh-only shows drift without proposing config changes.
+
+Is state sensitive?
+Yes. It can contain secrets in plaintext (passwords, ys, IPs). Never commit it to Git; use encrypted remote storage with restricted IAM access.
+
+What does terraform import do?
+Adds an existing resource to state so Terraform can manage it without recreating it. You still need to write the matching resource block.
+
+Useful terraform state commands?
+list (show tracked resources), show (inspect one), mv (rename/move), rm (stop tracking without destroying), pull (view raw state).
+
+What if state is lost or corrupted?
+Terraform loses track of resources and may propose recreating everything. Recover by restoring a previous version (bucket versioning) or local .backup, otherwise re-import resources, then confirm terraform plan shows no unexpected changes before applying.
+
+What does terraform state rm do?
+Removes a resource from state only. The real resource is untouched, and Terraform simply stops managing it.
+
+Can you manually edit state?
+Avoid it. Use terraform state subcommands, since hand-editing JSON risks corruption.
+
+How do you protect state?
+Remote backend, encryption at rest, least-privilege IAM, locking enabled, object versioning for recovery, and never in version control.
+
+Common mistakes to mention
+Local state in team setups, committing state to Git, no locking or versioning, hand-editing state, and ignoring drift.

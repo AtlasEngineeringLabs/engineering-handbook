@@ -603,3 +603,113 @@ Remote backend, encryption at rest, least-privilege IAM, locking enabled, object
 
 Common mistakes to mention
 Local state in team setups, committing state to Git, no locking or versioning, hand-editing state, and ignoring drift.
+
+# Module 8 — Terraform Modules
+
+Q1. What is a Terraform module?
+A Terraform module is a collection of configuration files that are evaluated together. Modules provide a mechanism for organising, encapsulating and reusing infrastructure configuration.
+
+Q2. What is the difference between a root module and a child module?
+The root module is the entry point of a Terraform configuration. A child module is called by another module to provide reusable infrastructure functionality. Child modules normally share the state of their calling root configuration.
+
+Q3. Do Terraform child modules have separate state files?
+No. Child module resources are normally managed within the root module's state. Independent root configurations with distinct state locations are required when separate deployment and state boundaries are needed.
+
+Q4. How do Terraform modules communicate?
+Modules communicate through input variables and output values. A calling module can reference the output of one child module and pass it into another chilmodule as an input.
+
+Q5. How does Terraform determine dependencies between modules?
+Terraform identifies implicit dependencies through configuration references. For example, passing a network module's subnet output into a compute module creates an implicit dependency.
+
+Explicit depends_on declarations can be used when dependencies cannot be inferred automatically.
+
+Q6. What is loose coupling in Terraform module design?
+Loose coupling means modules depend on defined interfaces rather than the internal implementation of other modules. This improves maintainability, portability and reusability.
+
+Q7. How would you structure Terraform for multiple environments?
+I would use independent root configurations for each environment, consuming shared reusable modules. Each environment would have a distinct state location, environment-specific configuration and appropriate access controls.
+
+Q8. How do you version Terraform modules?
+Modules stored in Git can be pinned using tags or commit references. Registry modules support version constraints through the version argument.
+Semantic versioning can communicate breaking changes, backwards-compatible functionality and fixes.
+
+Q9. Does releasing a new module version automatically update Production?
+No, provided Production is pinned to a specific module release. The production configuration must explicitly adopt the new version and be reinitialised.
+
+Q10. Does the Terraform dependency lock file lock module versions?
+No. The .terraform.lock.hcl file records selected provider versions and checksums. Remote module versions must be controlled through module source references or registry version constraints.
+
+Q11. What happens if you rename a Terraform module?
+Renaming a module call changes the resource addresses associated with that module. Terraform may interpret this as removing existing resources and creating new ones unless an appropriate address migration is defined.
+
+Q12. How can you rename a module without recreating its infrastructure?
+Use a moved block to associate the old module address with the new address.
+moved {
+  from = module.compute
+  to   = module.virtual_machines
+}
+
+Review the resulting plan to confirm that no unintended infrastructure changes are proposed.
+
+Q13. What is the difference between a moved block and terraform state mv?
+A moved block declares an address migration within Terraform configuration, allowing it to be version-controlled and reviewed.
+The terraform state mv command directly modifies the resource mapping in state.
+Moved blocks are generally preferable for planned refactoring.
+
+Q14. What is the difference between terraform validate, plan and test?
+Validate checks syntax and internal configuration consistency.
+
+Plan evaluates proposed infrastructure changes.
+
+Test executes defined Terraform tests and assertions.
+
+None of these commands individually guarantees a successful or disruption-free production deployment.
+
+Q15. Can a Terraform module test create real cloud resources?
+Yes. Apply-based tests can provision real infrastructure. Appropriate test isolation, cost controls and cleanup procedures are required.
+
+Plan-based tests do not apply their planned resources, although they may still interact with provider APIs.
+
+Q16. How would you safely upgrade a production Terraform module?
+I would review release notes, compatibility, provider requirements and resource address changes. I would validate the module in lower environments and generate a production-specific Terraform plan.
+
+Before approval, I would assess service impact, replacement behaviour, redundancy, recovery procedures and monitoring requirements.
+
+Q17. What does -/+ mean in a Terraform plan?
+It indicates that Terraform intends to destroy an existing resource and then create its replacement.
+
+This may introduce service disruption and requires operational impact assessment before production approval.
+
+Q18. Would you approve a production plan that replaces three VMs if all automated tests passed?
+Not without further assessment. I would establish why replacement is required, which services are affected, whether redundancy is available and whether appropriate recovery and change management procedures exist.
+
+Q19. What are the benefits of centrally maintained Terraform modules?
+Centralised modules reduce code duplication, improve infrastructure consistency, enforce common security baselines and allow testing and improvements to be managed centrally.
+
+Trade-offs include dependency on maintainers, release coordination, reduced flexibility and potential shared defects.
+
+Q20. Should a reusable module expose every possible resource attribute?
+No. Modules should expose a carefully selected set of inputs that satisfy consumer requirements while maintaining standardisation, security and manageable complexity.
+
+Q21. How would you reduce the blast radius of a Terraform deployment?
+I would establish appropriate root configuration and state boundaries, isolate environments, use least-privilege permissions and independently manage infrastructure components where their lifecycle requirements justify separation.
+
+Q22. Can two separate Terraform root configurations exchange information?
+Yes. They can exchange information through published outputs, provider data sources or remote state references.
+
+Remote state access must be carefully controlled because access to outputs through a remote state backend can also require access to the underlying state data.
+
+Q23. Why is reverting Terraform code not always sufficient for rollback?
+Terraform manages real infrastructure. If a resource has already been destroyed, reverting the configuration may recreate a resource but will not necessarily restore its previous data, identity or operational state.
+
+A recovery plan must address infrastructure and application recovery.
+
+Q24. How would you design a Terraform module for a trading platform?
+I would define a clear infrastructure responsibility, provide a controlled interface, establish secure defaults and support workload-specific requirements.
+
+I would version and test the module, isolate deployment state appropriately and ensure that upgrades are evaluated against availability, latency, security and operational requirements.
+
+Q25. When should you create a new Terraform module?
+A module should be created when it provides a meaningful reusable infrastructure capability or a clear architectural abstraction.
+Creating modules solely to wrap every individual resource can introduce unnecessary complexity without delivering meaningful value.
+
